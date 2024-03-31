@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_TRACKS 100
+
+void sortArray(int arr[], int size) {
+    int i, j, temp;
+
+    for (i = 0; i < size - 1; i++) {
+        for (j = 0; j < size - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                temp = arr[j];
+                arr[j] = arr[j + 1];
+                arr[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int findClosestTrack(int tracks[], int numTracks, int currentPosition, int direction) {
+    int i;
+    int closestTrack = -1;
+
+    if (direction == 1) { 
+        for (i = 0; i < numTracks; i++) {
+            if (tracks[i] >= currentPosition) {
+                closestTrack = i;
+                break;
+            }
+        }
+        if (closestTrack == -1) {
+            closestTrack = numTracks - 1;
+        }
+    } else { 
+        for (i = numTracks - 1; i >= 0; i--) {
+            if (tracks[i] <= currentPosition) {
+                closestTrack = i;
+                break;
+            }
+        }
+        if (closestTrack == -1) {
+            closestTrack = 0;
+        }
+    }
+
+    return closestTrack;
+}
+
+void simulateCSCAN(int tracks[], int numTracks, int currentPosition) {
+    int i, direction = 1; 
+    int headMovement = 0;
+
+    sortArray(tracks, numTracks);
+
+    int closestTrack = findClosestTrack(tracks, numTracks, currentPosition, direction);
+
+    for (i = closestTrack; i < numTracks; i++) {
+        headMovement += abs(tracks[i] - currentPosition);
+        currentPosition = tracks[i];
+    }
+
+    headMovement += abs(tracks[numTracks - 1] - tracks[0]);
+
+    currentPosition = tracks[0];
+    headMovement += abs(tracks[0] - tracks[closestTrack]);
+
+    for (i = closestTrack + 1; i < numTracks; i++) {
+        headMovement += abs(tracks[i] - currentPosition);
+        currentPosition = tracks[i];
+    }
+
+    float averageHeadMovement = (float) headMovement / numTracks;
+    printf("Average head movement: %.2f\n", averageHeadMovement);
+}
+
+int main() {
+    int tracks[MAX_TRACKS];
+    int numTracks;
+    int currentPosition;
+
+    printf("Enter the number of tracks: ");
+    scanf("%d", &numTracks);
+
+    printf("Enter the track positions: ");
+    for (int i = 0; i < numTracks; i++) {
+        scanf("%d", &tracks[i]);
+    }
+
+    printf("Enter the current position of the head: ");
+    scanf("%d", &currentPosition);
+
+    simulateCSCAN(tracks, numTracks, currentPosition);
+
+    return 0;
+}
